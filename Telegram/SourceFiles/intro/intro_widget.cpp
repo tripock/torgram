@@ -36,6 +36,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "boxes/abstract_box.h"
 #include "core/update_checker.h"
 #include "core/application.h"
+#include "core/torgram_controller.h"
 #include "mtproto/mtproto_dc_options.h"
 #include "window/window_slide_animation.h"
 #include "window/window_connecting_widget.h"
@@ -131,6 +132,28 @@ Widget::Widget(
 			st::windowSubTextFg->c);
 		_testModeLabel->show(anim::type::instant);
 	}
+
+	_torgramStatus.create(
+		this,
+		object_ptr<Ui::FlatLabel>(
+			this,
+			QString(),
+			st::defaultFlatLabel));
+	_torgramStatus->entity()->setTextColorOverride(st::windowSubTextFg->c);
+	_torgramStatus->show(anim::type::instant);
+	Core::App().torgram().statusValue(
+	) | rpl::start_with_next([=](Core::TorgramStatus status) {
+		_torgramStatus->entity()->setText(
+			tr::lng_torgram_status_label(
+				tr::now,
+				lt_status,
+				Core::TorgramStatusText(status)));
+		const auto ok = (status == Core::TorgramStatus::Connected);
+		_torgramStatus->entity()->setTextColorOverride(ok
+			? st::windowSubTextFg->c
+			: st::attentionButtonFg->c);
+		updateControlsGeometry();
+	}, lifetime());
 
 	Lang::CurrentCloudManager().firstLanguageSuggestion(
 	) | rpl::on_next([=] {
@@ -867,6 +890,12 @@ void Widget::updateControlsGeometry() {
 		_terms->moveToLeft(
 			(width() - _terms->width()) / 2,
 			height() - st::introTermsBottom - _terms->height());
+	}
+	if (_torgramStatus) {
+		const auto label = _torgramStatus->entity();
+		_torgramStatus->moveToLeft(
+			(width() - label->width()) / 2,
+			height() - label->height() - st::introSettingsSkip);
 	}
 }
 

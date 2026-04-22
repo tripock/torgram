@@ -26,6 +26,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "core/click_handler_types.h"
 #include "core/core_cloud_password.h"
 #include "core/core_settings.h"
+#include "core/torgram_controller.h"
 #include "core/update_checker.h"
 #include "data/components/passkeys.h"
 #include "data/components/top_peers.h"
@@ -1155,6 +1156,43 @@ void BuildConfirmationExtensions(SectionBuilder &builder) {
 	builder.addDividerText(tr::lng_settings_edit_extensions_about());
 }
 
+void BuildTorgramSection(SectionBuilder &builder) {
+	builder.addSkip();
+	builder.addSubsectionTitle(tr::lng_torgram_settings_section());
+
+	const auto voice = builder.addButton({
+		.id = u"privacy/torgram_voice"_q,
+		.title = tr::lng_torgram_calls_voice_bypass(),
+		.st = &st::settingsButtonNoIcon,
+		.toggled = rpl::single(::Torgram::AllowVoiceCallsOutsideTor()),
+	});
+	if (voice) {
+		voice->toggledValue(
+		) | rpl::filter([](bool v) {
+			return v != ::Torgram::AllowVoiceCallsOutsideTor();
+		}) | rpl::start_with_next([](bool v) {
+			::Torgram::SetAllowVoiceCallsOutsideTor(v);
+		}, voice->lifetime());
+	}
+
+	const auto video = builder.addButton({
+		.id = u"privacy/torgram_video"_q,
+		.title = tr::lng_torgram_calls_video_bypass(),
+		.st = &st::settingsButtonNoIcon,
+		.toggled = rpl::single(::Torgram::AllowVideoCallsOutsideTor()),
+	});
+	if (video) {
+		video->toggledValue(
+		) | rpl::filter([](bool v) {
+			return v != ::Torgram::AllowVideoCallsOutsideTor();
+		}) | rpl::start_with_next([](bool v) {
+			::Torgram::SetAllowVideoCallsOutsideTor(v);
+		}, video->lifetime());
+	}
+
+	builder.addDividerText(tr::lng_torgram_calls_bypass_about());
+}
+
 void BuildPrivacySecuritySectionContent(SectionBuilder &builder) {
 	auto updateOnTick = rpl::single(
 	) | rpl::then(base::timer_each(kUpdateTimeout));
@@ -1169,6 +1207,7 @@ void BuildPrivacySecuritySectionContent(SectionBuilder &builder) {
 	BuildConfirmationExtensions(builder);
 	BuildTopPeersSection(builder);
 	BuildSelfDestructionSection(builder, trigger());
+	BuildTorgramSection(builder);
 }
 
 class PrivacySecurity : public Section<PrivacySecurity> {

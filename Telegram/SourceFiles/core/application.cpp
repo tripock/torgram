@@ -28,6 +28,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "core/local_url_handlers.h"
 #include "core/launcher.h"
 #include "core/proxy_rotation_manager.h"
+#include "core/torgram_controller.h"
 #include "core/ui_integration.h"
 #include "chat_helpers/emoji_keywords.h"
 #include "chat_helpers/stickers_emoji_image_loader.h"
@@ -156,6 +157,7 @@ Application::Application()
 , _platformIntegration(Platform::Integration::Create())
 , _batterySaving(std::make_unique<base::BatterySaving>())
 , _mediaDevices(std::make_unique<Webrtc::Environment>())
+, _torgram(std::make_unique<TorgramController>())
 , _databases(std::make_unique<Storage::Databases>())
 , _animationsManager(std::make_unique<Ui::Animations::Manager>())
 , _clearEmojiImageLoaderTimer([=] { clearEmojiSourceImages(); })
@@ -221,6 +223,8 @@ Application::~Application() {
 		Local::writeSettings();
 	}
 
+	_torgram->shutdown();
+
 	_windowStack.clear();
 	setLastActiveWindow(nullptr);
 	_windowInSettings = _lastActivePrimaryWindow = nullptr;
@@ -272,6 +276,8 @@ void Application::run() {
 
 	ValidateScale();
 
+	_torgram->enforceSettings();
+	_torgram->probeNow();
 	refreshGlobalProxy(); // Depends on app settings being read.
 
 	if (const auto old = Local::oldSettingsVersion(); old < AppVersion) {
