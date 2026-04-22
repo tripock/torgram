@@ -19,6 +19,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "core/application.h"
 #include "core/launcher.h"
 #include "core/local_url_handlers.h"
+#include "core/torgram_controller.h"
 #include "core/update_checker.h"
 #include "core/deadlock_detector.h"
 #include "base/timer.h"
@@ -465,21 +466,10 @@ void Sandbox::checkForQuit() {
 }
 
 void Sandbox::refreshGlobalProxy() {
-	const auto proxy = !Core::IsAppLaunched()
-		? _sandboxProxy
-		: Core::App().settings().proxy().isEnabled()
-		? Core::App().settings().proxy().selected()
-		: MTP::ProxyData();
-	if (proxy.type == MTP::ProxyData::Type::Socks5
-		|| proxy.type == MTP::ProxyData::Type::Http) {
-		QNetworkProxy::setApplicationProxy(
-			MTP::ToNetworkProxy(MTP::ToDirectIpProxy(proxy)));
-	} else if (!Core::IsAppLaunched()
-		|| Core::App().settings().proxy().isSystem()) {
-		QNetworkProxyFactory::setUseSystemConfiguration(true);
-	} else {
-		QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
-	}
+	const auto required = Core::TorgramController::RequiredProxy();
+	QNetworkProxy::setApplicationProxy(
+		MTP::ToNetworkProxy(MTP::ToDirectIpProxy(required)));
+	QNetworkProxyFactory::setUseSystemConfiguration(false);
 }
 
 void Sandbox::checkForEmptyLoopNestingLevel() {

@@ -1,3 +1,14 @@
+Torgram fork (22.04.26)
+
+- Force all MTProto traffic through Tor SOCKS5 on 127.0.0.1:9050.
+- Kill-switch: no bytes leave the client until Tor is reachable.
+- Bundled Tor Expert Bundle for Windows, macOS and Linux, auto-spawned
+  when no system Tor is running.
+- Tor status indicator at the bottom of the intro screen and Settings.
+- Privacy toggles: allow voice / video calls outside Tor (off by default).
+- Outgoing images are stripped of EXIF/metadata (GPS, camera, timestamps)
+  before being sent as photos or files.
+
 6.7.7 beta (20.04.26)
 
 - Proxy auto-rotation option.

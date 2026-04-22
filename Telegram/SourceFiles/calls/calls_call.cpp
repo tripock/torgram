@@ -17,6 +17,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "calls/calls_panel.h"
 #include "core/application.h"
 #include "core/core_settings.h"
+#include "core/torgram_controller.h"
 #include "data/data_group_call.h"
 #include "data/data_session.h"
 #include "data/data_user.h"
@@ -317,6 +318,15 @@ bool Call::isIncomingWaiting() const {
 
 void Call::start(bytes::const_span random) {
 	Expects(!conferenceInvite());
+
+	if (!Torgram::IsCallAllowed(_videoCapture != nullptr)) {
+		Ui::show(Ui::MakeInformBox({
+			.text = tr::lng_torgram_call_blocked(tr::now),
+			.title = tr::lng_torgram_blocked_title(tr::now),
+		}));
+		finish(FinishType::Failed);
+		return;
+	}
 
 	// Save config here, because it is possible that it changes between
 	// different usages inside the same call.

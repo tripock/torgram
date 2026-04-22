@@ -324,6 +324,21 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_sure_enable_socks" = "Are you sure you want to enable this proxy?\n\nServer: {server}\nPort: {port}\n\nYou can change your proxy server later in Settings > Advanced > Connection Type.";
 "lng_sure_enable" = "Enable";
 "lng_proxy_box_title" = "Enable proxy";
+
+"lng_torgram_status_label" = "Torgram: {status}";
+"lng_torgram_status_unknown" = "checking Tor…";
+"lng_torgram_status_probing" = "connecting through Tor…";
+"lng_torgram_status_connected" = "routed through Tor";
+"lng_torgram_status_failed" = "Tor unreachable (network blocked)";
+"lng_torgram_blocked_title" = "Torgram — network blocked";
+"lng_torgram_blocked_text" = "Torgram could not reach a local Tor SOCKS5 proxy on 127.0.0.1:9050. No traffic will be sent outside Tor. Please start the Tor service (for example, run the Tor Browser or the `tor` daemon) and try again.";
+"lng_torgram_retry" = "Retry now";
+"lng_torgram_settings_section" = "Tor (Torgram)";
+"lng_torgram_calls_voice_bypass" = "Allow voice calls outside Tor";
+"lng_torgram_calls_video_bypass" = "Allow video calls outside Tor";
+"lng_torgram_calls_bypass_about" = "Voice and video calls use peer-to-peer UDP and cannot be routed through Tor. By default Torgram blocks them to avoid leaking your IP. Enable an option above to permit that type of call despite the leak.";
+"lng_torgram_call_blocked" = "This call type is disabled by Torgram to prevent IP leak outside Tor. Enable it in Privacy & Security settings.";
+"lng_torgram_exif_scrub_note" = "Strip location/EXIF metadata from outgoing images";
 "lng_proxy_box_table_title" = "Proxy Server";
 "lng_proxy_box_table_button" = "Connect Proxy";
 "lng_proxy_box_table_checking" = "Checking…";

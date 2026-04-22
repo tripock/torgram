@@ -38,6 +38,7 @@ include(cmake/td_tde2e.cmake)
 include(cmake/td_ui.cmake)
 include(cmake/telegram_apple_swift_runtime.cmake)
 include(cmake/generate_appstream_changelog.cmake)
+include(cmake/torgram_tor.cmake)
 
 if (DESKTOP_APP_TEST_APPS)
     include(cmake/tests.cmake)
@@ -557,6 +558,10 @@ PRIVATE
     core/sandbox.h
     core/shortcuts.cpp
     core/shortcuts.h
+    core/torgram_controller.cpp
+    core/torgram_controller.h
+    core/torgram_image_scrub.cpp
+    core/torgram_image_scrub.h
     core/ui_integration.cpp
     core/ui_integration.h
     core/update_checker.cpp

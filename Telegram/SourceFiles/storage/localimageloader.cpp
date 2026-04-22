@@ -16,6 +16,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "core/core_settings.h"
 #include "core/file_utilities.h"
 #include "core/mime_type.h"
+#include "core/torgram_image_scrub.h"
 #include "base/unixtime.h"
 #include "base/random.h"
 #include "editor/scene/scene_item_sticker.h"
@@ -179,13 +180,14 @@ struct PreparedFileThumbnail {
 		&& (bytes.size()
 			<= full.width() * full.height() * kRecompressAfterBpp / 8)
 		&& (format == u"jpeg"_q)) {
-		if (!Images::IsProgressiveJpeg(bytes)) {
-			if (const auto result = Images::MakeProgressiveJpeg(bytes)
+		const auto scrubbed = Core::Torgram::ScrubJpegMetadata(bytes);
+		if (!Images::IsProgressiveJpeg(scrubbed)) {
+			if (const auto result = Images::MakeProgressiveJpeg(scrubbed)
 				; !result.isEmpty()) {
 				return result;
 			}
 		} else {
-			return bytes;
+			return scrubbed;
 		}
 	}
 
@@ -197,7 +199,7 @@ struct PreparedFileThumbnail {
 	writer.write(full);
 	buffer.close();
 
-	return result;
+	return Core::Torgram::ScrubJpegMetadata(result);
 }
 
 } // namespace
@@ -1028,6 +1030,25 @@ void FileLoadTask::process(ProcessArgs &&args) {
 	_result->filename = filename;
 	_result->filemime = filemime;
 	_result->setFileData(filedata);
+
+	if (_type == SendMediaType::File
+		&& filemime.startsWith(u"image/"_q)
+		&& !Core::IsMimeSticker(filemime)) {
+		if (_result->content.isEmpty() && !_result->filepath.isEmpty()) {
+			auto file = QFile(_result->filepath);
+			if (file.open(QIODevice::ReadOnly)
+				&& file.size() <= kFileSizeLimit) {
+				_result->content = file.readAll();
+			}
+		}
+		if (!_result->content.isEmpty()) {
+			_result->content = Core::Torgram::ScrubImageMetadata(
+				_result->content,
+				filemime);
+			_result->filepath = QString();
+			_result->filesize = _result->content.size();
+		}
+	}
 
 	_result->thumbId = thumbnail.id;
 	_result->thumbname = thumbnail.name;

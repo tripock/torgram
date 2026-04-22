@@ -114,6 +114,7 @@ namespace Core {
 struct LocalUrlHandler;
 class Settings;
 class Tray;
+class TorgramController;
 
 enum class LaunchState {
 	Running,
@@ -223,6 +224,11 @@ public:
 	void checkProxyRotation(not_null<Main::Account*> account, int32 state);
 	[[nodiscard]] rpl::producer<ProxyChange> proxyChanges() const;
 	void badMtprotoConfigurationError();
+
+	// Torgram.
+	[[nodiscard]] TorgramController &torgram() const {
+		return *_torgram;
+	}
 
 	// Databases.
 	[[nodiscard]] Storage::Databases &databases() {
@@ -409,6 +415,7 @@ private:
 	const std::unique_ptr<base::BatterySaving> _batterySaving;
 	const std::unique_ptr<Webrtc::Environment> _mediaDevices;
 
+	const std::unique_ptr<TorgramController> _torgram;
 	const std::unique_ptr<Storage::Databases> _databases;
 	const std::unique_ptr<Ui::Animations::Manager> _animationsManager;
 	crl::object_on_queue<Stickers::EmojiImageLoader> _emojiImageLoader;
